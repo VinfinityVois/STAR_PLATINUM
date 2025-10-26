@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliRoute Pro | Вход в систему</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .auth-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .auth-subtitle {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .demo-accounts {
+            margin: 20px 0;
+        }
+
+        .demo-divider {
+            text-align: center;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .demo-divider span {
+            background: white;
+            padding: 0 15px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .demo-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e5e7eb;
+            z-index: -1;
+        }
+
+        .demo-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .demo-btn {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            width: 100%;
+        }
+
+        .demo-btn:hover {
+            border-color: #3b82f6;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .demo-btn.admin:hover {
+            border-color: #f59e0b;
+        }
+
+        .demo-btn.manager:hover {
+            border-color: #10b981;
+        }
+
+        .demo-btn.demo:hover {
+            border-color: #8b5cf6;
+        }
+
+        .demo-icon {
+            font-size: 20px;
+            margin-right: 12px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .demo-text {
+            font-weight: 500;
+            color: #1f2937;
+            flex: 1;
+        }
+
+        .demo-desc {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .auth-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .auth-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 10000;
+            max-width: 300px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        .auth-notification.error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-left: 4px solid #ef4444;
+            color: #dc2626;
+        }
+
+        .auth-notification.success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-left: 4px solid #10b981;
+            color: #059669;
+        }
+
+        .auth-notification-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Screen -->
+    <div id="authScreen" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <div class="logo-icon">🚀</div>
+                    <span class="logo-text">IntelliRoute Pro</span>
+                </div>
+                <h1 class="auth-title" id="authTitle">IntelliRoute Pro</h1>
+                <p class="auth-subtitle" id="authSubtitle">Выберите демо-аккаунт для входа в систему</p>
+            </div>
+            
+            <form id="authForm">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="email" placeholder="your@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Пароль</label>
+                    <input type="password" class="form-input" id="password" placeholder="Введите пароль" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" id="authSubmit">
+                    <span id="authSubmitText">Войти в систему</span>
+                </button>
+            </form>
+
+            <div class="demo-accounts">
+                <div class="demo-divider">
+                    <span>Демо-доступ к системе</span>
+                </div>
+                <div class="demo-buttons">
+                    <button type="button" class="demo-btn admin" onclick="fillDemoCredentials('admin@intelliroute.ru', 'admin123')">
+                        <span class="demo-icon">👑</span>
+                        <span class="demo-text">Администратор</span>
+                        <span class="demo-desc">Полный доступ</span>
+                    </button>
+                    <button type="button" class="demo-btn manager" onclick="fillDemoCredentials('manager@company.ru', 'manager123')">
+                        <span class="demo-icon">👨‍💼</span>
+                        <span class="demo-text">Менеджер</span>
+                        <span class="demo-desc">Базовый доступ</span>
+                    </button>
+                    <button type="button" class="demo-btn demo" onclick="fillDemoCredentials('demo@example.com', 'demo')">
+                        <span class="demo-icon">🧪</span>
+                        <span class="demo-text">Демо-режим</span>
+                        <span class="demo-desc">Тестовый доступ</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="auth-footer">
+                <span>Система планирования маршрутов</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class SimpleAuthManager {
+            constructor() {
+                this.demoUsers = {
+                    'admin@intelliroute.ru': {
+                        password: 'admin123',
+                        name: 'Администратор Системы',
+                        avatar: 'AИ',
+                        role: 'admin'
+                    },
+                    'manager@company.ru': {
+                        password: 'manager123',
+                        name: 'Менеджер Петров',
+                        avatar: 'МП',
+                        role: 'manager'
+                    },
+                    'demo@example.com': {
+                        password: 'demo',
+                        name: 'Демо Пользователь',
+                        avatar: 'ДП',
+                        role: 'user'
+                    }
+                };
+                this.init();
+            }
+
+            init() {
+                this.bindAuthEvents();
+                this.checkAuthStatus();
+            }
+
+            bindAuthEvents() {
+                const authForm = document.getElementById('authForm');
+                if (authForm) {
+                    authForm.addEventListener('submit', (e) => this.handleAuth(e));
+                }
+            }
+
+            handleAuth(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                if (!this.validateEmail(email)) {
+                    this.showAuthError('Введите корректный email');
+                    return;
+                }
+
+                this.handleLogin(email, password);
+            }
+
+            validateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+
+            handleLogin(email, password) {
+                const user = this.demoUsers[email];
+                
+                if (user && user.password === password) {
+                    const userData = {
+                        email: email,
+                        name: user.name,
+                        avatar: user.avatar,
+                        role: user.role
+                    };
+                    
+                    localStorage.setItem('currentUser', JSON.stringify(userData));
+                    localStorage.setItem('isLoggedIn', 'true');
+                    
+                    // Перенаправляем на основное приложение
+                    window.location.href = 'index.html';
+                    
+                } else {
+                    this.showAuthError('Неверный email или пароль. Используйте демо-аккаунты.');
+                }
+            }
+
+            // checkAuthStatus() {
+            //     const isLoggedIn = localStorage.getItem('isLoggedIn');
+            //     if (isLoggedIn) {
+            //         // Если уже авторизован, перенаправляем сразу
+            //         window.location.href = 'index.html';
+            //     }
+            // }
+
+            showAuthError(message) {
+                this.showNotification(message, 'error');
+            }
+
+            showNotification(message, type = 'info') {
+                // Удаляем существующие уведомления
+                const existingNotifications = document.querySelectorAll('.auth-notification');
+                existingNotifications.forEach(notification => notification.remove());
+
+                const notification = document.createElement('div');
+                notification.className = `auth-notification ${type}`;
+                notification.innerHTML = `
+                    <div class="auth-notification-content">
+                        <span class="auth-notification-icon">${type === 'error' ? '❌' : '✅'}</span>
+                        <span>${message}</span>
+                    </div>
+                `;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 5000);
+            }
+        }
+
+        // Глобальная функция для заполнения демо-данных
+        window.fillDemoCredentials = function(email, password) {
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            
+            if (emailInput) emailInput.value = email;
+            if (passwordInput) passwordInput.value = password;
+            
+            // Автоматически отправляем форму
+            setTimeout(() => {
+                const authForm = document.getElementById('authForm');
+                if (authForm) {
+                    const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                    authForm.dispatchEvent(submitEvent);
+                }
+            }, 100);
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            new SimpleAuthManager();
+        });
+    </script>
+</body>
+</html>

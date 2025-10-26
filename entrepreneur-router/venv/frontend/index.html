@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliRoute Pro | Система планирования маршрутов</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+       <!-- Main App -->
+    <div id="app" class="hidden">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🚀</div>
+                    <span class="logo-text">IntelliRoute</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <div class="hamburger">≡</div>
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-label">ОСНОВНЫЕ</div>
+                <a href="#planner" class="nav-item active" data-section="planner">
+                    <div class="nav-icon">🗺️</div>
+                    <span class="nav-text">Планировщик</span>
+                    <div class="nav-badge">8</div>
+                </a>
+                <a href="#map" class="nav-item" data-section="map">
+                    <div class="nav-icon">📍</div>
+                    <span class="nav-text">Карта</span>
+                </a>
+                <a href="#analytics" class="nav-item" data-section="analytics">
+                    <div class="nav-icon">📊</div>
+                    <span class="nav-text">Аналитика</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-label">ИНСТРУМЕНТЫ</div>
+                <a href="#optimization" class="nav-item" data-section="optimization">
+                    <div class="nav-icon">⚡</div>
+                    <span class="nav-text">Оптимизация</span>
+                    <div class="nav-badge pro">AI</div>
+                </a>
+                <a href="#schedule" class="nav-item" data-section="schedule">
+                    <div class="nav-icon">🕐</div>
+                    <span class="nav-text">Расписание</span>
+                </a>
+                <a href="#settings" class="nav-item" data-section="settings">
+                    <div class="nav-icon">⚙️</div>
+                    <span class="nav-text">Настройки</span>
+                </a>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar" id="userAvatar">EP</div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">Иван Петров</div>
+                        <div class="user-status">Online</div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main id="mainContent" class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 class="page-title" id="pageTitle">Планировщик маршрутов</h1>
+                    <div class="breadcrumb" id="breadcrumb">
+                        <span class="breadcrumb-item">Главная</span>
+                        <span class="breadcrumb-separator">/</span>
+                        <span class="breadcrumb-item active">Планировщик</span>
+                    </div>
+                </div>
+                
+                <!-- <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-value">8</span>
+                        <span class="stat-label">точек</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">2ч 15м</span>
+                        <span class="stat-label">время</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">45км</span>
+                        <span class="stat-label">дистанция</span>
+                    </div>
+                </div> -->
+                
+                <div class="header-actions">
+                    <div class="time-date-widget">
+                      <div class="current-time" id="currentTime">--:--:--</div>
+                      <div class="time-separator">|</div>
+                      <div class="current-date" id="currentDate">--.--.----</div>
+                  </div>
+                </div>
+            </header>
+
+            <!-- Content Sections -->
+            <div class="content-sections">
+                <!-- Planner Section -->
+                <section id="plannerSection" class="content-section active">
+                    <div class="planner-grid">
+                        <!-- Left Column - Input -->
+                        <div class="planner-column">
+                            <div class="input-card">
+                                <div class="card-header">
+                                    <h3>📋 Точки маршрута (<span id="pointsCount">0</span>)</h3>
+                                    <div class="card-actions">
+                                      <button class="icon-btn" id="templateBtn" title="Скачать шаблон">
+                                        📋 Шаблон
+                                    </button>
+                                        <button class="icon-btn" id="importExcelBtn" title="Импорт Excel">
+                                            📁 Excel
+                                        </button>
+                                        <button class="icon-btn" id="exportExcelBtn" title="Экспорт Excel">
+                                            💾 Экспорт
+                                        </button>
+                                        <button class="icon-btn" id="addAddressBtn" title="Добавить адрес">
+                                            ➕ Добавить
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="filters-bar">
+                                    <div class="search-box">
+                                        <input type="text" id="searchAddress" placeholder="Поиск по адресу...">
+                                        <div class="search-icon">🔍</div>
+                                    </div>
+                                    <label class="filter-checkbox">
+                                        <input type="checkbox" id="filterVIP">
+                                        <span class="checkmark"></span>
+                                        Только VIP клиенты
+                                    </label>
+                                </div>
+                                
+                                <div class="address-list" id="addressList">
+                                    <!-- Address items will be dynamically generated -->
+                                </div>
+
+                                <div class="card-footer">
+                                    <button class="btn btn-secondary" id="clearAllBtn">
+                                        🗑️ Очистить все
+                                    </button>
+                                    <button class="btn btn-primary" id="optimizeBtn">
+                                        ⚡ Оптимизировать
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="settings-card">
+                                <h3>⚙️ Параметры оптимизации</h3>
+                                <div class="settings-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Критерий оптимизации</label>
+                                        <select class="form-input" id="optimizationCriteria">
+                                            <option value="time">Минимизация времени</option>
+                                            <option value="distance">Минимизация расстояния</option>
+                                            <option value="balanced">Сбалансированный</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Тип транспорта</label>
+                                        <select class="form-input" id="transportType">
+                                            <option value="car">🚗 Автомобиль</option>
+                                            <option value="public">🚌 Общественный</option>
+                                            <option value="walking">🚶 Пешком</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Временные окна</label>
+                                        <div class="time-windows" style="display: flex; gap: 8px; align-items: center;">
+                                            <input type="time" class="form-input" id="startTime" value="09:00" style="flex: 1;">
+                                            <span>—</span>
+                                            <input type="time" class="form-input" id="endTime" value="18:00" style="flex: 1;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column - Results & Map -->
+                        <div class="planner-column">
+                            <!-- <div class="results-card">
+                                <div class="card-header">
+                                    <h3>📊 Результаты оптимизации</h3>
+                                    <div class="optimization-badge">
+                                        <span class="badge-text">GNN AI</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="results-content">
+                                    <div class="metrics-grid">
+                                        <div class="metric-card">
+                                            <div class="metric-value" id="totalTime">2ч 15м</div>
+                                            <div class="metric-label">Общее время</div>
+                                            <div class="metric-trend up">+15%</div>
+                                        </div>
+                                        <div class="metric-card">
+                                            <div class="metric-value" id="totalDistance">45 км</div>
+                                            <div class="metric-label">Расстояние</div>
+                                            <div class="metric-trend down">-12%</div>
+                                        </div>
+                                        <div class="metric-card">
+                                            <div class="metric-value" id="pointsCountResult">8</div>
+                                            <div class="metric-label">Точек</div>
+                                        </div>
+                                        <div class="metric-card">
+                                            <div class="metric-value" id="fuelSavings">125 ₽</div>
+                                            <div class="metric-label">Экономия</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> -->
+
+                            <!-- <div class="map-card">
+                                <div class="card-header">
+                                    <h3>🗺️ Карта маршрута</h3>
+                                    <div class="card-actions">
+                                        <button class="icon-btn" onclick="app.setMapType('standard')" title="Стандартная карта">🗺️</button>
+                                        <button class="icon-btn" onclick="app.setMapType('satellite')" title="Спутник">🛰️</button>
+                                        <button class="icon-btn" onclick="app.buildRouteOnMap()" title="Построить маршрут">🚗</button>
+                                        <button class="icon-btn" onclick="app.clearRoute()" title="Очистить маршрут">🗑️</button>
+                                    </div>
+                                </div>
+                                <div class="map-container">
+                                    <div id="mapPreview"></div>
+                                </div>
+                            </div> -->
+                            <!-- В разделе карты маршрута -->
+<div class="map-card">
+    <div class="card-header">
+        <h3>🗺️ Карта маршрута</h3>
+        <div class="card-actions">
+            <button class="icon-btn" onclick="app.setMapType('standard')" title="Стандартная карта">🗺️</button>
+            <button class="icon-btn" onclick="app.setMapType('satellite')" title="Спутник">🛰️</button>
+            <button class="icon-btn" onclick="app.buildRouteOnMap()" title="Построить маршрут">🚗</button>
+            <button class="icon-btn" onclick="app.clearRoute()" title="Очистить маршрут">🗑️</button>
+        </div>
+    </div>
+    
+    <!-- Окошко с метриками на карте -->
+    <div class="map-metrics-overlay">
+        <h4>Экономия маршрута</h4>
+        <div class="map-metrics-grid">
+            <div class="map-metric-item">
+                <div class="map-metric-value" id="mapTotalTime">2ч 15м</div>
+                <div class="map-metric-label">Время</div>
+                <div class="map-metric-trend up">+15%</div>
+            </div>
+            <div class="map-metric-item">
+                <div class="map-metric-value" id="mapTotalDistance">45 км</div>
+                <div class="map-metric-label">Дистанция</div>
+                <div class="map-metric-trend down">-12%</div>
+            </div>
+            <div class="map-metric-item">
+                <div class="map-metric-value" id="mapFuelSavings">125 ₽</div>
+                <div class="map-metric-label">Экономия</div>
+            </div>
+            <div class="map-metric-item">
+                <div class="map-metric-value" id="mapPointsCount">8</div>
+                <div class="map-metric-label">Точек</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="map-container">
+        <div id="mapPreview"></div>
+    </div>
+</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Map Section -->
+                <section id="mapSection" class="content-section">
+                    <div class="section-header">
+                        <h2>Интерактивная карта</h2>
+                        <p>Реальное время и трафик на карте 2ГИС</p>
+                    </div>
+                    <div class="full-map-container">
+                        <div id="fullMap"></div>
+                    </div>
+                </section>
+
+                <!-- Analytics Section -->
+                <section id="analyticsSection" class="content-section">
+                    <div class="section-header">
+                        <h2>Аналитика и отчеты</h2>
+                        <p>Статистика и метрики эффективности маршрутов</p>
+                    </div>
+                    <div class="analytics-content" id="analyticsContent">
+                        <!-- Analytics content will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Optimization Section -->
+                <section id="optimizationSection" class="content-section">
+                    <div class="section-header">
+                        <h2>AI Оптимизация</h2>
+                        <p>Продвинутые алгоритмы оптимизации маршрутов</p>
+                    </div>
+                    <div class="optimization-content" id="optimizationContent">
+                        <!-- Optimization content will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Schedule Section -->
+                <section id="scheduleSection" class="content-section">
+                  <div class="section-header">
+                      <h2>📅 Детальное планирование маршрутов</h2>
+                      <p>Автоматическое создание расписания с учетом рабочих часов и обеденных перерывов</p>
+                  </div>
+                  <div class="schedule-content" id="scheduleContent">
+                      <!-- Schedule content will be loaded here -->
+                  </div>
+              </section>
+
+                <!-- Settings Section -->
+                <section id="settingsSection" class="content-section">
+                    <div class="section-header">
+                        <h2>Настройки системы</h2>
+                        <p>Настройки приложения и параметры системы</p>
+                    </div>
+                    <div class="settings-content" id="settingsContent">
+                        <!-- Settings content will be loaded here -->
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Notification Center -->
+        <div id="notificationCenter" class="notification-center"></div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="src/utils/animations.js"></script>
+    <script src="src/utils/ExcelParser.js"></script>
+    <script src="src/components/MapView/LeafletMap.js"></script> <!-- Новый файл -->
+    <script src="src/components/DataTable.js"></script>
+    <script src="src/app.js"></script>
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Форматируем время
+            const time = now.toLocaleTimeString('ru-RU', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            // Форматируем дату в компактном формате ДД.ММ.ГГГГ
+            const date = now.toLocaleDateString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            
+            document.getElementById('currentTime').textContent = time;
+            document.getElementById('currentDate').textContent = date;
+        }
+
+        // Обновляем сразу и каждую секунду
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    </script>
+<script>
+        // Проверка авторизации при загрузке основного приложения
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const userData = localStorage.getItem('currentUser');
+            
+            if (!isLoggedIn || !userData) {
+                // Если не авторизован, перенаправляем на страницу входа
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            // Если авторизован, инициализируем приложение
+            const user = JSON.parse(userData);
+            
+            // Обновляем информацию о пользователе
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
+            
+            if (userAvatar) userAvatar.textContent = user.avatar;
+            if (userName) userName.textContent = user.name;
+            
+            // Инициализируем основное приложение
+            if (window.app) {
+                window.app.init();
+            }
+        });
+
+        // Функция выхода из системы
+        window.logout = function() {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'auth.html';
+        };
+    </script>
+</body>
+</html>
